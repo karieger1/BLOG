@@ -32510,7 +32510,16 @@ module.exports = require('./lib/React');
 },{"./lib/React":32}],160:[function(require,module,exports){
 "use strict";
 
-},{}],161:[function(require,module,exports){
+var $ = require("jquery");
+var Backbone = require("backbone");
+Backbone.$ = $;
+var CommentModel = require("../models/commentmodel");
+
+module.exports = Backbone.Collection.extend({
+	model: CommentModel
+});
+
+},{"../models/commentmodel":165,"backbone":1,"jquery":4}],161:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -32595,8 +32604,9 @@ module.exports = Backbone.Model.extend({
 	validate: function validate(attr) {
 		if (!attr.text) {
 			return 'You must enter a comment.';
+		} else {
+			return false;
 		}
-		return false;
 	}
 });
 

@@ -10,7 +10,8 @@ module.exports = Backbone.Model.extend({
 	validate: function(attr) {
 		if(!attr.text) {
 			return 'You must enter a comment.'
-		}
+		} else {
 		return false;
+		}
 	}
-});
+})
