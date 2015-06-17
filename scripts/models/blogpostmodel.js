@@ -7,7 +7,7 @@ module.exports = Backbone.Model.extend({
 		body: " ",
 		category: null,
 		username: null,
-		password:null
+		createdAt: null
 	},
 
 });

@@ -32508,35 +32508,148 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":32}],160:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var $ = require("jquery");
-var Backbone = require("backbone");
-Backbone.$ = $;
-var CommentModel = require("../models/commentmodel");
-
-module.exports = Backbone.Collection.extend({
-	model: CommentModel
-});
-
-},{"../models/commentmodel":165,"backbone":1,"jquery":4}],161:[function(require,module,exports){
-"use strict";
-
-var React = require("react");
+var React = require('react');
+var _ = require('backbone/node_modules/underscore');
 
 module.exports = React.createClass({
-	displayName: "exports",
+	displayName: 'exports',
 
+	componentWillMount: function componentWillMount() {
+		this.props.posts.on('add', this.postAdded);
+	},
+	getInitialState: function getInitialState() {
+		return {
+			number: this.props.number
+		};
+	},
 	render: function render() {
+		console.log('render was run', this.state.number);
+
+		// Sort the collection (that was passed in in main.js) by the createdAt property.
+		var sortedModels = this.props.posts.sortBy(function (postModel) {
+			return -1 * postModel.get('createdAt').getTime();
+		});
+
+		console.log(sortedModels);
+
+		// Grabbing the top N posts from the sorted list.
+		var topNModels = _.first(sortedModels, this.state.number);
+
+		// Converting the top N posts from Backbone models to react components.
+		// What we're left with is an array of react elements.
+		var topNElements = topNModels.map(function (postModel) {
+			return React.createElement(
+				'div',
+				{ key: postModel.cid },
+				React.createElement(
+					'h3',
+					null,
+					postModel.get('title')
+				),
+				React.createElement(
+					'p',
+					null,
+					postModel.get('body')
+				),
+				React.createElement(
+					'div',
+					null,
+					postModel.get('createdAt').toString(),
+					' | ',
+					postModel.get('category')
+				)
+			);
+		});
+
+		// Return the array of react elements wrapped in a div
 		return React.createElement(
-			"div",
+			'div',
 			null,
-			React.createElement("input", { type: "text", value: "comments" })
+			React.createElement('input', { type: 'text', ref: 'number', onChange: this.numberChanged }),
+			topNElements
 		);
+	},
+
+	postAdded: function postAdded(postModel) {
+		this.forceUpdate();
+	},
+
+	numberChanged: function numberChanged(e) {
+		console.log('number was changed');
+		var newNumber = this.refs.number.getDOMNode().value;
+		if (!newNumber) {
+			newNumber = 0;
+		}
+		newNumber = parseInt(newNumber);
+		this.setState({
+			number: newNumber
+		});
 	}
 });
 
-},{"react":159}],162:[function(require,module,exports){
+},{"backbone/node_modules/underscore":2,"react":159}],161:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var BlogModel = require('../models/blogpostmodel');
+
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	render: function render() {
+		var chooseCategory = this.props.allCategories.map(function (category) {
+			return React.createElement(
+				'option',
+				{ key: category },
+				category
+			);
+		});
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
+				'form',
+				{ onSubmit: this.submitBlog },
+				React.createElement('input', { type: 'text', ref: 'blogTitle', placeholder: 'Title goes here' }),
+				React.createElement('br', null),
+				React.createElement(
+					'select',
+					{ ref: 'blogCategory' },
+					' ',
+					chooseCategory,
+					' '
+				),
+				React.createElement('br', null),
+				React.createElement('textarea', { ref: 'blogText' }),
+				React.createElement('br', null),
+				React.createElement(
+					'button',
+					{ type: 'submit' },
+					'Post you blog'
+				)
+			),
+			React.createElement('div', { ref: 'errors' })
+		);
+	},
+	submitBlog: function submitBlog(e) {
+		e.preventDefault();
+		var blogPost = new BlogModel({
+			title: this.refs.blogTitle.getDOMNode().value,
+			body: this.refs.blogText.getDOMNode().value,
+			category: this.refs.blogCategory.getDOMNode().value,
+			createdAt: new Date()
+		});
+		if (!blogPost.isValid()) {
+			this.refs.errors.getDOMNode().innerHTML = blogPost.validationError;
+		} else {
+			this.props.newPost(blogPost);
+		}
+	}
+});
+
+},{"../models/blogpostmodel":166,"react":159}],162:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32572,24 +32685,146 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/commentmodel":165,"react":159}],163:[function(require,module,exports){
+},{"../models/commentmodel":167,"react":159}],163:[function(require,module,exports){
+"use strict";
 
-},{}],164:[function(require,module,exports){
+var React = require("react");
+var LoginModel = require("../models/loginmodel");
+
+module.exports = React.createClass({
+	displayName: "exports"
+});
+
+},{"../models/loginmodel":168,"react":159}],164:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
-var CommentForm = require('./components/commentform');
-var CommentList = require('./components/commentlist');
-var CommentCollection = require('./collections/commentcollection');
-var comments = require('./components/commentcomponent');
+
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	getInitialState: function getInitialState() {
+		return {
+			numLikes: 0
+		};
+	},
+	render: function render() {
+		return React.createElement(
+			'button',
+			{ onClick: this.incrementCounter },
+			this.state.numLikes,
+			' Likes'
+		);
+	},
+
+	incrementCounter: function incrementCounter(e) {
+		this.setState({
+			numLikes: this.state.numLikes + 1
+		});
+	}
+});
+
+},{"react":159}],165:[function(require,module,exports){
+// var React = require('react');
+// var CommentForm = require('./components/commentform');
+// var CommentList = require("./components/commentlist");
+// var CommentCollection = require("./collections/commentcollection");
+// var comments = require("./components/commentcomponent");
+// var BlogListComponent = require("./components/BlogListComponent");
+
+// React.render(
+// 	<div>
+// 	<BlogListComponent>
+// 	hello world
+// 	</BlogListComponent>
+
+// 	<div>
+// 		<CommentForm>
+// 		comment
+// 		<CommentForm />
+// 	</div>
+// 	document.getElementById('container')//must have this in main.js file. this targets the element in the html file
+// );
+
+'use strict';
+
+var React = require('react');
+var BlogListComponent = require('./components/BlogListComponent');
+var BlogPostFormComponent = require('./components/blogpostformcomponent');
+var RecentPostsComponent = require('./components/recentpostscomponent');
+var CommentFormComponent = require('./components/commentformcomponent');
+var LoginFormComponent = require('./components/loginformcomponent');
+
+var blogPosts = new BlogPostCollection([{
+	title: 'Breaking news! React is awesome :)',
+	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	userId: 1,
+	category: 'react',
+	createdAt: new Date('2015-06-16T08:13:00')
+}, {
+	title: 'The Iron Yard opens a campus in London',
+	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	userId: 1,
+	category: 'the iron yard',
+	createdAt: new Date('2015-06-15T15:24:00')
+}, {
+	title: 'I\'m out of titles',
+	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	userId: 1,
+	category: 'dispair',
+	createdAt: new Date('2015-06-16T10:04:00')
+}, {
+	title: 'Title 1',
+	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	userId: 1,
+	category: 'react',
+	createdAt: new Date('2015-06-16T08:13:00')
+}, {
+	title: 'Title 2',
+	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	userId: 1,
+	category: 'the iron yard',
+	createdAt: new Date('2015-06-15T15:24:00')
+}, {
+	title: 'Title 3',
+	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	userId: 1,
+	category: 'dispair',
+	createdAt: new Date('2015-06-16T10:04:00')
+}]);
+
+var allCategories = ['react', 'javascript', 'html', 'css'];
+function newPost(postModel) {
+	console.log('newPost was run');
+	blogPosts.add(postModel);
+}
 
 React.render(React.createElement(
 	'div',
 	null,
-	React.createElement(CommentForm, null)
+	React.createElement(RecentPostsComponent, null),
+	React.createElement(BlogFormComponent, { allCategories: allCategories, newPost: newPost }),
+	React.createElement(BlogListComponent, { posts: blogPosts, number: 7 })
 ), document.getElementById('container'));
 
-},{"./collections/commentcollection":160,"./components/commentcomponent":161,"./components/commentform":162,"./components/commentlist":163,"react":159}],165:[function(require,module,exports){
+},{"./components/BlogListComponent":160,"./components/blogpostformcomponent":161,"./components/commentformcomponent":162,"./components/loginformcomponent":163,"./components/recentpostscomponent":164,"react":159}],166:[function(require,module,exports){
+'use strict';
+
+var Backbone = require('backbone');
+Backbone.$ = require('jquery');
+
+module.exports = Backbone.Model.extend({
+	defaults: {
+		title: ' ',
+		body: ' ',
+		category: null,
+		username: null,
+		createdAt: null
+	}
+
+});
+
+},{"backbone":1,"jquery":4}],167:[function(require,module,exports){
 'use strict';
 
 var Backbone = require('backbone');
@@ -32610,7 +32845,9 @@ module.exports = Backbone.Model.extend({
 	}
 });
 
-},{"backbone":1,"jquery":4}]},{},[164])
+},{"backbone":1,"jquery":4}],168:[function(require,module,exports){
+
+},{}]},{},[165])
 
 
 //# sourceMappingURL=all.js.map

@@ -1,0 +1,7 @@
+things we learned about today (16.06) -ish:
+	this.state
+	this.setState
+	getInitialState
+
+	component lifecycle 
+		componentWillMount
