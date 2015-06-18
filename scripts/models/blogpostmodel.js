@@ -9,5 +9,5 @@ module.exports = Backbone.Model.extend({
 		username: null,
 		createdAt: null
 	},
-
+	//need validation stuff for this model!
 });

@@ -1,6 +1,5 @@
-var $ = require("jquery");
-var Backbone = require("backbone");
-Backbone.$ = $;
+var Backbone = require('backbone');
+Backbone.$ = require('jquery');
 var CommentModel = require("../models/commentmodel");
 
 module.exports = Backbone.Collection.extend({
