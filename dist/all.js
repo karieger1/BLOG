@@ -32510,6 +32510,28 @@ module.exports = require('./lib/React');
 },{"./lib/React":32}],160:[function(require,module,exports){
 'use strict';
 
+var Backbone = require('backbone');
+Backbone.$ = require('jquery');
+var BlogPostModel = require('../models/blogpostmodel');
+
+module.exports = Backbone.Collection.extend({
+	model: BlogPostModel
+});
+
+},{"../models/blogpostmodel":168,"backbone":1,"jquery":4}],161:[function(require,module,exports){
+'use strict';
+
+var Backbone = require('backbone');
+Backbone.$ = require('jquery');
+var CommentModel = require('../models/commentmodel');
+
+module.exports = Backbone.Collection.extend({
+	model: CommentModel
+});
+
+},{"../models/commentmodel":169,"backbone":1,"jquery":4}],162:[function(require,module,exports){
+'use strict';
+
 var React = require('react');
 var _ = require('backbone/node_modules/underscore');
 
@@ -32589,7 +32611,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"backbone/node_modules/underscore":2,"react":159}],161:[function(require,module,exports){
+},{"backbone/node_modules/underscore":2,"react":159}],163:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32635,7 +32657,7 @@ module.exports = React.createClass({
 	},
 	submitBlog: function submitBlog(e) {
 		e.preventDefault();
-		var blogPost = new BlogModel({
+		var blogPost = new blogpostmodel({
 			title: this.refs.blogTitle.getDOMNode().value,
 			body: this.refs.blogText.getDOMNode().value,
 			category: this.refs.blogCategory.getDOMNode().value,
@@ -32649,7 +32671,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/blogpostmodel":166,"react":159}],162:[function(require,module,exports){
+},{"../models/blogpostmodel":168,"react":159}],164:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32685,17 +32707,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/commentmodel":167,"react":159}],163:[function(require,module,exports){
-"use strict";
-
-var React = require("react");
-var LoginModel = require("../models/loginmodel");
-
-module.exports = React.createClass({
-	displayName: "exports"
-});
-
-},{"../models/loginmodel":168,"react":159}],164:[function(require,module,exports){
+},{"../models/commentmodel":169,"react":159}],165:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32724,90 +32736,144 @@ module.exports = React.createClass({
 	}
 });
 
-},{"react":159}],165:[function(require,module,exports){
-// var React = require('react');
-// var CommentForm = require('./components/commentform');
-// var CommentList = require("./components/commentlist");
-// var CommentCollection = require("./collections/commentcollection");
-// var comments = require("./components/commentcomponent");
-// var BlogListComponent = require("./components/BlogListComponent");
+},{"react":159}],166:[function(require,module,exports){
+"use strict";
 
-// React.render(
-// 	<div>
-// 	<BlogListComponent>
-// 	hello world
-// 	</BlogListComponent>
+var React = require("react");
+var LoginModel = require("../models/usermodel.js");
 
-// 	<div>
-// 		<CommentForm>
-// 		comment
-// 		<CommentForm />
-// 	</div>
-// 	document.getElementById('container')//must have this in main.js file. this targets the element in the html file
-// );
+module.exports = React.createClass({
+	displayName: "exports",
 
-'use strict';
+	render: function render() {
+		return React.createElement(
+			"form",
+			{ className: "loginform", onSubmit: this.commentSubmitted },
+			React.createElement(
+				"label",
+				null,
+				"Login Form"
+			),
+			React.createElement("div", { ref: "error", className: "error" }),
+			React.createElement("div", { ref: "success", className: "success" }),
+			React.createElement("input", { ref: "loginInput", type: "text", placeholder: "Email address" }),
+			React.createElement("input", { ref: "loginPass", type: "password", placeholder: "Password" }),
+			React.createElement(
+				"button",
+				null,
+				"Submit"
+			)
+		);
+	},
+	commentSubmitted: function commentSubmitted(e) {
+		e.preventDefault();
 
-var React = require('react');
-var BlogListComponent = require('./components/BlogListComponent');
-var BlogPostFormComponent = require('./components/blogpostformcomponent');
-var RecentPostsComponent = require('./components/recentpostscomponent');
-var CommentFormComponent = require('./components/commentformcomponent');
-var LoginFormComponent = require('./components/loginformcomponent');
+		var login = new usermodel({
+			user: this.refs.loginInput.getDOMNode().value,
+			password: this.refs.loginPass.getDOMNode().value
+		});
+
+		if (!login.isValid()) {
+			console.log(login.validationError);
+			this.refs.success.getDOMNode().innerHTML = "";
+			this.refs.error.getDOMNode().innerHTML = login.validationError;
+		} else {
+			this.refs.error.getDOMNode().innerHTML = "";
+			this.refs.success.getDOMNode().innerHTML = "Success!";
+		}
+	}
+
+});
+
+},{"../models/usermodel.js":170,"react":159}],167:[function(require,module,exports){
+"use strict";
+
+var React = require("react");
+var Backbone = require("backbone");
+Backbone.$ = require("jquery");
+var BlogList = require("./components/bloglistcomponent");
+var BlogPostForm = require("./components/blogpostformcomponent");
+var BlogPostCollection = require("./collections/blogpostcollection");
+var CommentCollection = require("./collections/commentcollection");
+var CommentForm = require("./components/commentformcomponent");
+var LoginForm = require("./components/loginformcomponent");
+var Counter = require("./components/countercomponent");
+var comments = new CommentCollection();
 
 var blogPosts = new BlogPostCollection([{
-	title: 'Breaking news! React is awesome :)',
-	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	title: "Breaking news! React is awesome :)",
+	body: "Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.",
 	userId: 1,
-	category: 'react',
-	createdAt: new Date('2015-06-16T08:13:00')
+	category: "react",
+	createdAt: new Date("2015-06-16T08:13:00")
 }, {
-	title: 'The Iron Yard opens a campus in London',
-	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	title: "The Iron Yard opens a campus in London",
+	body: "Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.",
 	userId: 1,
-	category: 'the iron yard',
-	createdAt: new Date('2015-06-15T15:24:00')
+	category: "the iron yard",
+	createdAt: new Date("2015-06-15T15:24:00")
 }, {
-	title: 'I\'m out of titles',
-	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	title: "I'm out of titles",
+	body: "Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.",
 	userId: 1,
-	category: 'dispair',
-	createdAt: new Date('2015-06-16T10:04:00')
+	category: "dispair",
+	createdAt: new Date("2015-06-16T10:04:00")
 }, {
-	title: 'Title 1',
-	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	title: "Title 1",
+	body: "Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.",
 	userId: 1,
-	category: 'react',
-	createdAt: new Date('2015-06-16T08:13:00')
+	category: "react",
+	createdAt: new Date("2015-06-16T08:13:00")
 }, {
-	title: 'Title 2',
-	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	title: "Title 2",
+	body: "Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.",
 	userId: 1,
-	category: 'the iron yard',
-	createdAt: new Date('2015-06-15T15:24:00')
+	category: "the iron yard",
+	createdAt: new Date("2015-06-15T15:24:00")
 }, {
-	title: 'Title 3',
-	body: 'Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.',
+	title: "Title 3",
+	body: "Lorem ipsum Id exercitation voluptate sunt officia aliquip labore sed ullamco in id culpa sit non aute deserunt velit laborum minim nulla dolore voluptate consectetur non proident sint sunt magna commodo occaecat anim eiusmod adipisicing incididunt velit aliqua dolore consequat.",
 	userId: 1,
-	category: 'dispair',
-	createdAt: new Date('2015-06-16T10:04:00')
+	category: "dispair",
+	createdAt: new Date("2015-06-16T10:04:00")
 }]);
 
-var allCategories = ['react', 'javascript', 'html', 'css'];
+var allCategories = ["react", "javascript", "html", "css"];
+
 function newPost(postModel) {
-	console.log('newPost was run');
+	console.log("newPost was run");
 	blogPosts.add(postModel);
 }
 
-React.render(React.createElement(
-	'div',
-	null,
-	React.createElement(RecentPostsComponent, null),
-	React.createElement(BlogFormComponent, { allCategories: allCategories, newPost: newPost }),
-	React.createElement(BlogListComponent, { posts: blogPosts, number: 7 })
-), document.getElementById('container'));
+var App = Backbone.Router.extend({
+	routes: {
+		"": "login",
+		"home": "home",
+		"post": "post"
+	},
 
-},{"./components/BlogListComponent":160,"./components/blogpostformcomponent":161,"./components/commentformcomponent":162,"./components/loginformcomponent":163,"./components/recentpostscomponent":164,"react":159}],166:[function(require,module,exports){
+	login: function login() {
+		React.render(React.createElement(LoginForm, { blogPosts: blogPosts }), //this needs to match variable name
+		document.getElementById("container"));
+	},
+
+	home: function home() {
+		React.render(React.createElement(
+			"div",
+			null,
+			React.createElement(BlogListComponent, { posts: blogPosts, number: 7 })
+		), document.getElementById("container"));
+	},
+
+	post: function post() {
+		React.render(React.createElement(BlogFormComponent, { allCategories: allCategories, newPost: newPost }), document.getElementById("container"));
+	}
+});
+
+var myApp = new App(); //instantiate the router
+Backbone.history.start(); //start listening for change events
+
+},{"./collections/blogpostcollection":160,"./collections/commentcollection":161,"./components/bloglistcomponent":162,"./components/blogpostformcomponent":163,"./components/commentformcomponent":164,"./components/countercomponent":165,"./components/loginformcomponent":166,"backbone":1,"jquery":4,"react":159}],168:[function(require,module,exports){
 'use strict';
 
 var Backbone = require('backbone');
@@ -32820,11 +32886,26 @@ module.exports = Backbone.Model.extend({
 		category: null,
 		username: null,
 		createdAt: null
-	}
+	},
+	//need validation stuff for this model!
+	validate: function validate(attr) {
 
+		if (!attr.title) {
+
+			return 'Enter a post title.';
+		} else if (attr.category == '') {
+
+			return 'Enter a post category.';
+		} else if (!attr.body) {
+
+			return 'Enter a post body.';
+		}
+
+		return false;
+	}
 });
 
-},{"backbone":1,"jquery":4}],167:[function(require,module,exports){
+},{"backbone":1,"jquery":4}],169:[function(require,module,exports){
 'use strict';
 
 var Backbone = require('backbone');
@@ -32837,17 +32918,50 @@ module.exports = Backbone.Model.extend({
 		createdAt: null
 	},
 	validate: function validate(attr) {
+
 		if (!attr.text) {
+
 			return 'You must enter a comment.';
 		} else {
+
 			return false;
 		}
 	}
 });
 
-},{"backbone":1,"jquery":4}],168:[function(require,module,exports){
+},{"backbone":1,"jquery":4}],170:[function(require,module,exports){
+'use strict';
 
-},{}]},{},[165])
+var Backbone = require('backbone'); //models and collections are built using backbone!
+Backbone.$ = require('jquery');
+
+module.exports = Backbone.Model.extend({
+	defaults: {
+		username: '',
+		password: ''
+	},
+
+	//validate stuff here
+
+	validate: function validate(model) {
+		if (validator.isNull(model.user)) {
+			return 'You must enter an email address.';
+		} else if (!validator.isEmail(model.user)) {
+			return 'Enter a valid email address.';
+		} else if (validator.isNull(model.password)) {
+			return 'Enter a password.';
+		} else if (model.user !== 'blah@blah.com') {
+			return 'Nope.';
+		} else if (model.password !== 'blah') {
+			return 'Nope.';
+		}
+	}
+});
+// email: "",
+// numPosts: null,
+// blogId: ""
+
+},{"backbone":1,"jquery":4}]},{},[167])
 
 
 //# sourceMappingURL=all.js.map

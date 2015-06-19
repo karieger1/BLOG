@@ -1,31 +1,14 @@
-// var React = require('react');
-// var CommentForm = require('./components/commentform');
-// var CommentList = require("./components/commentlist");
-// var CommentCollection = require("./collections/commentcollection");
-// var comments = require("./components/commentcomponent");
-// var BlogListComponent = require("./components/BlogListComponent");
-
-
-// React.render(
-// 	<div>
-// 	<BlogListComponent>
-// 	hello world
-// 	</BlogListComponent>
-
-// 	<div>
-// 		<CommentForm>
-// 		comment
-// 		<CommentForm />
-// 	</div>
-// 	document.getElementById('container')//must have this in main.js file. this targets the element in the html file
-// );
-
 var React = require('react');
-var BlogListComponent = require('./components/BlogListComponent');
-var BlogPostFormComponent = require('./components/blogpostformcomponent');
-var RecentPostsComponent = require('./components/recentpostscomponent');
-var CommentFormComponent = require("./components/commentformcomponent");
-var LoginFormComponent = require("./components/loginformcomponent");
+var Backbone = require("backbone");
+Backbone.$ = require("jquery");
+var BlogList = require("./components/bloglistcomponent");
+var BlogPostForm = require("./components/blogpostformcomponent");
+var BlogPostCollection = require("./collections/blogpostcollection");
+var CommentCollection = require("./collections/commentcollection");
+var CommentForm = require("./components/commentformcomponent");
+var LoginForm = require("./components/loginformcomponent");
+var Counter = require("./components/countercomponent");
+var comments = new CommentCollection();
 
 var blogPosts = new BlogPostCollection([
 	{
@@ -73,16 +56,44 @@ var blogPosts = new BlogPostCollection([
 ]);
 
 var allCategories = ['react', 'javascript', 'html', 'css'];
+
 function newPost(postModel) {
 	console.log('newPost was run');
 	blogPosts.add(postModel);
 }
 
-React.render(
-	<div>
-		<RecentPostsComponent />
-		<BlogFormComponent allCategories={allCategories} newPost={newPost} />
-		<BlogListComponent posts={blogPosts} number={7} />
-	</div>,
-	document.getElementById('container')
-)
+var App = Backbone.Router.extend({
+	routes: {
+		"": "login",
+		"home": "home",
+		"post": "post",
+	},
+
+	login: function() {
+		React.render(
+
+			<LoginForm blogPosts={blogPosts} />,//this needs to match variable name
+			document.getElementById('container')
+		);
+	},
+
+	home: function() {
+		React.render(
+			<div>
+				<BlogListComponent posts={blogPosts} number={7} />
+			</div>,
+			document.getElementById('container')
+		);
+	},
+
+	post: function() {
+		React.render(
+			<BlogFormComponent allCategories={allCategories} newPost={newPost} />,
+			document.getElementById('container')
+		);
+	}
+});
+
+
+var myApp = new App(); //instantiate the router
+Backbone.history.start(); //start listening for change events

@@ -10,4 +10,21 @@ module.exports = Backbone.Model.extend({
 		createdAt: null
 	},
 	//need validation stuff for this model!
+	 validate: function(attr) {
+
+		if(!attr.title) {
+
+			return "Enter a post title."
+
+		} else if(attr.category == '') {
+
+			return "Enter a post category."
+
+		} else if(!attr.body) {
+
+			return "Enter a post body."
+		}
+
+		return false;
+	}
 });

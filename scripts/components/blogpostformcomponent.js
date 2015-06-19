@@ -23,7 +23,7 @@ module.exports = React.createClass({
 	},
 	submitBlog: function(e) {
 		e.preventDefault();
-		var blogPost = new BlogModel({
+		var blogPost = new blogpostmodel({
 			title: this.refs.blogTitle.getDOMNode().value,
 			body: this.refs.blogText.getDOMNode().value,
 			category: this.refs.blogCategory.getDOMNode().value,
