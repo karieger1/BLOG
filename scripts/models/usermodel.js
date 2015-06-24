@@ -1,14 +1,20 @@
-var Backbone = require('backbone');  //models and collections are built using backbone!
-Backbone.$ = require('jquery');
+var parseSettings = require('../config/parse');
+var Backbone = require('backparse')(parseSettings);
 
 module.exports = Backbone.Model.extend({
 	defaults: {
-		username: "",
-		password: "",
-		// email: "",
-		// numPosts: null,
-		// blogId: ""
+		username: '',
+		password: '',
+		email: ''
 	},
+	parseClassName: '_User',
+	idAttribute: 'objectId',
+	isUser: true,
+	save: function(key, val, options) {
+		this.unset('confirmPassword');
+		return Backbone.Model.prototype.save.call(this, key, val, options);
+	}
+});
 
 	//validate stuff here
 	
